@@ -1,0 +1,226 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model InterviewActionPoint {
+  id                 String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at         DateTime?           @default(now()) @db.Timestamp(6)
+  interview_id       String?             @db.Uuid
+  action_text        String?
+  ScheduledInterview ScheduledInterview? @relation(fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model InterviewEvaluation {
+  id                 String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at         DateTime?           @default(now()) @db.Timestamp(6)
+  interview_id       String?             @unique @db.Uuid
+  candidate_name     String?
+  interview_role     String?
+  interview_mode     String?
+  interview_date     DateTime?           @db.Date
+  total_score        Int?
+  ScheduledInterview ScheduledInterview? @relation(fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model InterviewEvaluationParameter {
+  id                 String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at         DateTime?           @default(now()) @db.Timestamp(6)
+  interview_id       String?             @db.Uuid
+  parameter_name     String?
+  score              Int?
+  comment            String?
+  ScheduledInterview ScheduledInterview? @relation(fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model InterviewHireAssessment {
+  id                 String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at         DateTime?           @default(now()) @db.Timestamp(6)
+  interview_id       String?             @unique @db.Uuid
+  technical          String?
+  behavioral         String?
+  ScheduledInterview ScheduledInterview? @relation(fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model InterviewImprovementArea {
+  id                 String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at         DateTime?           @default(now()) @db.Timestamp(6)
+  interview_id       String?             @db.Uuid
+  weakness           String?
+  explanation        String?
+  how_to_improve     String?
+  ScheduledInterview ScheduledInterview? @relation(fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model InterviewQuestion {
+  id                        String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at                DateTime?           @default(now()) @db.Timestamp(6)
+  resume_id                 String?             @db.Uuid
+  interview_id              String?             @db.Uuid
+  question_text             String?
+  question_type             String?
+  topic                     String?
+  difficulty_level          String?
+  ai_generated              Boolean?
+  answer                    String?
+  feedback                  String?
+  order_number              Int?
+  was_pre_genrated          Boolean?            @default(false)
+  is_project_based_question Boolean?            @default(false)
+  ScheduledInterview        ScheduledInterview? @relation(fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Resume                    Resume?             @relation(fields: [resume_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model InterviewTargetCompany {
+  id                 String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at         DateTime?           @default(now()) @db.Timestamp(6)
+  interview_id       String?             @db.Uuid
+  company_type       String?
+  ScheduledInterview ScheduledInterview? @relation(fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Resume {
+  id                    String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at            DateTime?               @default(now()) @db.Timestamp(6)
+  resume_ref_name       String?
+  profile_name          String?
+  user_id               String?                 @db.Uuid
+  is_deleted            Boolean?                @default(false)
+  deleted_at            DateTime?               @default(now()) @db.Timestamp(6)
+  InterviewQuestion     InterviewQuestion[]
+  User                  User?                   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ResumeAdditionalAward ResumeAdditionalAward[]
+  ResumeCertification   ResumeCertification[]
+  ResumeEducation       ResumeEducation[]
+  ResumeExperience      ResumeExperience[]
+  ResumePersonalInfo    ResumePersonalInfo[]
+  ResumeProject         ResumeProject[]
+  ResumeSkillSet        ResumeSkillSet[]
+  ScheduledInterview    ScheduledInterview[]
+}
+
+model ResumeAdditionalAward {
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  title      String?
+  resume_id  String?   @db.Uuid
+  Resume     Resume?   @relation(fields: [resume_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ResumeCertification {
+  id               String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  certificate_name String?
+  certificate_link String?
+  issued_by        String?
+  resume_id        String?   @db.Uuid
+  Resume           Resume?   @relation(fields: [resume_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ResumeEducation {
+  id               String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  institution      String?
+  location         String?
+  degree_type      String?
+  field_of_study   String?
+  start_month_year String?
+  end_month_year   String?
+  score_metric     String?
+  score            String?
+  resume_id        String?   @db.Uuid
+  Resume           Resume?   @relation(fields: [resume_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ResumeExperience {
+  id               String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  employer         String?
+  Job_title        String?
+  location         String?
+  start_month_year String?
+  end_month_year   String?
+  resume_id        String?   @db.Uuid
+  Resume           Resume?   @relation(fields: [resume_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ResumePersonalInfo {
+  id               String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  first_name       String?
+  last_name        String?
+  email            String?
+  phone            String?
+  address          String?
+  dob              String?
+  job_title        String?
+  git_link         String?
+  linkedin_profile String?
+  portfolio_link   String?
+  resume_id        String?   @db.Uuid
+  Resume           Resume?   @relation(fields: [resume_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ResumeProject {
+  id                String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at        DateTime? @default(now()) @db.Timestamp(6)
+  project_name      String?
+  technologies_used String?
+  project_link      String?
+  description       String?
+  resume_id         String?   @db.Uuid
+  Resume            Resume?   @relation(fields: [resume_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ResumeSkillSet {
+  id                       String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at               DateTime? @default(now()) @db.Timestamp(6)
+  programming_languages    String[]
+  libraries_and_frameworks String[]
+  tools_and_platforms      String[]
+  databases                String[]
+  concepts                 String[]
+  resume_id                String?   @db.Uuid
+  Resume                   Resume?   @relation(fields: [resume_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ScheduledInterview {
+  id                           String                         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at                   DateTime?                      @default(now()) @db.Timestamp(6)
+  user_id                      String?                        @db.Uuid
+  resume_id                    String?                        @db.Uuid
+  scheduled_at                 DateTime?                      @db.Timestamp(6)
+  interview_type               String?
+  difficulty_level             String?
+  question_count               Int?
+  duration_minutes             Int?
+  interview_status             String?
+  InterviewActionPoint         InterviewActionPoint[]
+  InterviewEvaluation          InterviewEvaluation?
+  InterviewEvaluationParameter InterviewEvaluationParameter[]
+  InterviewHireAssessment      InterviewHireAssessment?
+  InterviewImprovementArea     InterviewImprovementArea[]
+  InterviewQuestion            InterviewQuestion[]
+  InterviewTargetCompany       InterviewTargetCompany[]
+  Resume                       Resume?                        @relation(fields: [resume_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User                         User?                          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model User {
+  id                 String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  first_name         String?
+  last_name          String?
+  email              String?              @unique
+  password           String?
+  updated_at         String?
+  is_mail_verified   Boolean?             @default(false)
+  is_deleted         Boolean?             @default(false)
+  deleted_at         DateTime?            @default(now()) @db.Timestamp(6)
+  Resume             Resume[]
+  ScheduledInterview ScheduledInterview[]
+}
